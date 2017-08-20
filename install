@@ -7,14 +7,10 @@ echo "======================================================="
 echo "======== Setting up Raspberry Pi WiFi hotspot ========="
 echo "======================================================="
 
-read -r -p "This script will make changes to your system which may break some applications and may require you to reimage your SD card. Are you sure that you wish to continue? [y/N] " confirm
 
-if [[ $confirm =~ ^([yY][eE][sS]|[yY])$ ]]
-then
-	clear
 	echo "Updating package lists"
 
-	apt-get -y -qq update
+	#apt-get -y -qq update
 
 	echo "Installing dependencies"
 
@@ -73,28 +69,10 @@ then
 	echo "Configuring DHCP"
 	read -r -p "Do you want to use preconfigured DNS servers? [y/N] " altdnsresponse
 
-	if [[ $altdnsresponse =~ ^([yY][eE][sS]|[yY])$ ]]
-	then
-		read -r -p "Do you wish to use Unblock-Us DNS servers? [y/N] " unblockusdnsresponse
-		if [[ $unblockusdnsresponse =~ ^([yY][eE][sS]|[yY])$ ]]
-		then
+
 			cp ./config-files/udhcpd_unblockus.conf /etc/udhcpd.conf
-		else
-			read -r -p "Do you wish to use OpenDNS DNS servers? [y/N] " opendnsresponse
-			if [[ $opendnsresponse =~ ^([yY][eE][sS]|[yY])$ ]]
-			then
-				cp ./config-files/udhcpd_opendns.conf /etc/udhcpd.conf
-			else
-				echo "No other DNS servers available to choose from. Reverting to Google DNS."
-				cp ./config-files/udhcpd_google.conf /etc/udhcpd.conf
-			fi
-		fi
-	else
-		read -r -p "Please enter a custom dns server address of the form xxx.xxx.xxx.xxx : " _DNS
-		read -r -p "Please enter a custom router number from 0-254 : " _ROUTER
-		sed -e "s/ROUTER/${_ROUTER}/g" -e "s/DNS/${_DNS}/" ./config-files/udhcpd_template.conf > /etc/udhcpd.conf
-		sed -e "s/ROUTER/${_ROUTER}/g" -e "s/DNS/${_DNS}/" ./config-files/udhcpd_template.conf > /etc/udhcpd.conf
-	fi
+
+
 	# Copy in the file to enable udhcpd
 	cp ./config-files/udhcpd /etc/default
 
@@ -106,28 +84,9 @@ then
 	fi
 
 	echo "Configuring hostapd"
-	read -r -p "Do you want to ues the default wifi password of 01234567890 and ssid of RaspberryPiFi? [y/N] " althostapdresponse
 
-	if [[ $althostapdresponse =~ ^([yY][eE][sS]|[yY])$ ]]
-	then
 		cp ./config-files/hostapd.conf /etc/hostapd
-	else
-		read -r -p "Please enter a new ssid: " _SSID
-		_PASSWORD1="0"
-		_PASSWORD2="1"
-		read -r -s -p "Please enter a new password atleast 8 characters long (lenght is not checked): " _PASSWORD1
-		echo
-		read -r -s -p "Please enter the new password again: " _PASSWORD2
-		echo
-		while [ ${_PASSWORD1} != ${_PASSWORD2} ]
-		do
-			echo "Password mismatch please try again."
-			read -r -s -p "Please enter a new password atleast 8 characters long (lenght is not checked): " _PASSWORD1
-			read -r -s -p "Please enter the new password again: " _PASSWORD2
-			echo
-		done
-		sed -e "s/0123456789A/${_PASSWORD1}/g" -e "s/RaspberryPiFi/${_SSID}/g" ./config-files/hostapd.conf > /etc/hostapd/hostapd.conf
-	fi
+
 	cp ./config-files/hostapd /etc/default
 
 
@@ -135,29 +94,14 @@ then
 	#   option for adafruit wifi adapter or any rtl871x adapter
 	#############################################################
 
-	read -r -p "Are you using an rtl871x chipset (such as one purchased via adafruit? (if in doubt, select no) [y/N] " adafruit
-
-	if [[ $adafruit =~ ^([yY][eE][sS]|[yY])$ ]]
-	then
-		mv /usr/sbin/hostapd /usr/sbin/hostapd.ORIG
-		echo "Adafruit hostapd binary copied"
-		cp ./hostapd-adafruit /usr/sbin/hostapd
-		cp ./config-files/hostapd-adafruit.conf /etc/hostapd/hostapd.conf
-		chmod 755 /usr/sbin/hostapd
-	fi
-
 
 	echo "Configuring NAT"
 	cp ./config-files/sysctl.conf /etc
 
 	echo "Configuring iptables"
-	read -r -p "Do you require chromecast support for unblock-us? [y/N] " chromecastresponse
-	if [[ $chromecastresponse =~ ^([yY][eE][sS]|[yY])$ ]]
-	then
-		cp ./config-files/iptables-chromecast /etc/iptables.ipv4.nat
-	else
+
 		cp ./config-files/iptables.ipv4.nat /etc
-	fi
+
 
 	touch /var/lib/misc/udhcpd.leases
 
@@ -174,20 +118,9 @@ then
 	echo "=================== Configuration complete! ===================="
 	echo "================================================================"
 
-	echo "+++++++++++++++++  REBOOTING in 10 SECONDS  ++++++++++++++++++++"
-	echo "++++++++++++++++++++++ CTL-C to cancel ++++++++++++++++++++++++"
 
-	sleep 10
-	reboot
 
-	exit 0
 
 #else
  #   exit 1
-
-fi
-
-
-
-
 
