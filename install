@@ -67,10 +67,9 @@ echo "======================================================="
 	####################################################################
 
 	echo "Configuring DHCP"
-	read -r -p "Do you want to use preconfigured DNS servers? [y/N] " altdnsresponse
 
 
-			cp ./config-files/udhcpd_unblockus.conf /etc/udhcpd.conf
+	cp ./config-files/udhcpd_unblockus.conf /etc/udhcpd.conf
 
 
 	# Copy in the file to enable udhcpd
@@ -85,7 +84,7 @@ echo "======================================================="
 
 	echo "Configuring hostapd"
 
-		cp ./config-files/hostapd.conf /etc/hostapd
+	cp ./config-files/hostapd.conf /etc/hostapd
 
 	cp ./config-files/hostapd /etc/default
 
@@ -100,7 +99,7 @@ echo "======================================================="
 
 	echo "Configuring iptables"
 
-		cp ./config-files/iptables.ipv4.nat /etc
+	cp ./config-files/iptables.ipv4.nat /etc
 
 
 	touch /var/lib/misc/udhcpd.leases
