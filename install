@@ -8,9 +8,6 @@ echo "======== Setting up Raspberry Pi WiFi hotspot ========="
 echo "======================================================="
 
 
-	echo "Updating package lists"
-
-	apt-get -y -qq update
 
 	echo "Installing dependencies"
 
